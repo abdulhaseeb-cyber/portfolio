@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Abdul Haseeb — Cybersecurity Programmer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root {
+  --c-bg:       #040506;
+  --c-bg1:      #080a0d;
+  --c-bg2:      #0d1014;
+  --c-bg3:      #131720;
+  --c-bg4:      #1a1f28;
+  --c-border:   rgba(255,255,255,0.06);
+  --c-border2:  rgba(255,255,255,0.10);
+  --c-border3:  rgba(255,255,255,0.17);
+  --c-white:    #cdd4de;
+  --c-mid:      #4e5663;
+  --c-sub:      #798492;
+  --c-ghost:    #252b34;
+  --c-accent:   #a8b2be;
+  --c-green:    #2a5c38;
+  --c-green2:   #3e9158;
+  --c-greenhl:  rgba(62,145,88,.12);
+  --f-mono:     'JetBrains Mono', monospace;
+  --f-display:  'Syne', sans-serif;
+  --ease:       cubic-bezier(.4,0,.2,1);
+}
+
+/* ─────────────────────────────────────────
+   RESET
+───────────────────────────────────────── */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  background:var(--c-bg);
+  color:var(--c-white);
+  font-family:var(--f-mono);
+  overflow-x:hidden;
+  cursor:none;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ─────────────────────────────────────────
+   TEXTURE OVERLAYS
+───────────────────────────────────────── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:9100; pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.055) 2px, rgba(0,0,0,0.055) 4px
+  );
+}
+body::after {
+  content:''; position:fixed; inset:0; z-index:9099; pointer-events:none;
+  opacity:.35;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+
+/* ─────────────────────────────────────────
+   CURSOR
+───────────────────────────────────────── */
+#c-dot, #c-ring { position:fixed; pointer-events:none; z-index:9999; }
+#c-dot {
+  width:5px; height:5px; background:#fff; border-radius:50%;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+}
+#c-ring {
+  width:24px; height:24px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .2s var(--ease), height .2s var(--ease), border-color .2s;
+  mix-blend-mode:difference;
+}
+body:has(a:hover) #c-ring,
+body:has(button:hover) #c-ring { width:36px; height:36px; border-color:rgba(255,255,255,.45); }
+
+/* ─────────────────────────────────────────
+   HEX PATTERN BACKGROUND
+───────────────────────────────────────── */
+#hex-bg {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  overflow:hidden;
+}
+#hex-bg svg { width:100%; height:100%; }
+
+/* ─────────────────────────────────────────
+   NAV
+───────────────────────────────────────── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:600;
+  height:54px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 64px;
+  background:rgba(4,5,6,.92);
+  backdrop-filter:blur(24px) saturate(1.2);
+  -webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--c-border);
+  animation:nav-in .6s var(--ease) both;
+}
+@keyframes nav-in { from{transform:translateY(-100%);opacity:0} to{transform:none;opacity:1} }
+
+.nav-id {
+  font-family:var(--f-mono); font-size:11px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--c-white); text-decoration:none;
+  transition:opacity .2s;
+}
+.nav-id:hover { opacity:.7; }
+.nav-id .dim { color:var(--c-ghost); }
+
+.nav-center { display:flex; align-items:center; gap:0; list-style:none; }
+.nav-center a {
+  display:block; padding:6px 18px;
+  font-size:9px; font-family:var(--f-mono); font-weight:400;
+  letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--c-mid); text-decoration:none;
+  position:relative; transition:color .2s;
+}
+.nav-center a::after {
+  content:''; position:absolute;
+  bottom:0; left:18px; right:18px; height:1px;
+  background:var(--c-white);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .3s var(--ease);
+}
+.nav-center a:hover,
+.nav-center a.on { color:var(--c-white); }
+.nav-center a:hover::after,
+.nav-center a.on::after { transform:scaleX(1); }
+
+.nav-signal {
+  display:flex; align-items:center; gap:8px;
+  font-size:8.5px; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--c-mid);
+}
+.signal-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--c-green2);
+  box-shadow:0 0 7px rgba(62,145,88,.6);
+  animation:blink 2.6s var(--ease) infinite;
+}
+@keyframes blink {
+  0%,100% { opacity:1; }
+  50%      { opacity:.18; }
+}
+
+/* ─────────────────────────────────────────
+   HERO
+───────────────────────────────────────── */
+.hero {
+  min-height:100vh;
+  padding:54px 120px 100px;
+  display:flex; align-items:center;
+  position:relative; z-index:1; overflow:hidden;
+}
+.hero-left { flex:1; max-width:740px; }
+
+/* staggered entrance */
+.h-a1 { opacity:0; animation:rise .55s .2s var(--ease) both; }
+.h-a2 { opacity:0; animation:rise .6s .35s var(--ease) both; }
+.h-a3 { opacity:0; animation:rise .55s .52s var(--ease) both; }
+.h-a4 { opacity:0; animation:rise .55s .60s var(--ease) both; }
+.h-a5 { opacity:0; animation:rise .55s .74s var(--ease) both; }
+.h-a6 { opacity:0; animation:rise .55s .88s var(--ease) both; }
+@keyframes rise { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+
+/* prompt line */
+.hero-prompt {
+  display:flex; align-items:center; gap:9px;
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:26px;
+}
+.hp-host { color:var(--c-sub); }
+.hp-tilde { color:var(--c-ghost); }
+.hp-cmd   { color:var(--c-green2); }
+
+/* name */
+.hero-name {
+  font-family:var(--f-display); font-weight:800;
+  font-size:clamp(62px,9.5vw,128px);
+  line-height:.82; letter-spacing:-4px;
+  text-transform:uppercase; color:var(--c-white);
+  margin-bottom:32px;
+}
+.hero-name span { display:block; }
+
+/* role */
+.hero-role {
+  display:flex; align-items:center; gap:12px;
+  font-size:10px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--c-sub); margin-bottom:8px;
+}
+.hero-role::after {
+  content:''; flex:0 0 100px; height:1px; background:var(--c-border2);
+}
+
+/* sub-note */
+.hero-sub {
+  font-size:11px; letter-spacing:.3px; font-style:italic;
+  color:var(--c-ghost); margin-bottom:42px;
+}
+
+/* terminal typer */
+.hero-typer {
+  display:flex; align-items:center; gap:0;
+  font-size:12px; margin-bottom:54px; min-height:20px;
+}
+.typer-ps1 { color:var(--c-green2); margin-right:10px; user-select:none; }
+#tw {
+  color:var(--c-accent);
+  border-right:1.5px solid var(--c-accent);
+  padding-right:2px;
+}
+
+/* stats row */
+.hero-stats { display:flex; align-items:stretch; gap:0; }
+.hs {
+  display:flex; flex-direction:column; gap:5px;
+  padding:0 26px;
+  border-right:1px solid var(--c-border);
+}
+.hs:first-child { padding-left:0; }
+.hs:last-child  { border-right:none; }
+.hs-val { font-size:9px; letter-spacing:2.5px; text-transform:uppercase; color:var(--c-sub); }
+.hs-key { font-size:7.5px; letter-spacing:2.5px; text-transform:uppercase; color:var(--c-ghost); }
+
+/* right art */
+.hero-right {
+  position:absolute; right:72px; top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:0; animation:glow-in 1.6s .4s ease both;
+}
+@keyframes glow-in {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+
+/* ─────────────────────────────────────────
+   DIVIDER
+───────────────────────────────────────── */
+.divider {
+  height:1px; background:var(--c-border);
+  margin:0 120px; position:relative; z-index:1;
+}
+
+/* ─────────────────────────────────────────
+   SECTION BASE
+───────────────────────────────────────── */
+.sec {
+  padding:100px 120px;
+  position:relative; z-index:1;
+  opacity:0; transform:translateY(22px);
+  transition:opacity .75s var(--ease), transform .75s var(--ease);
+}
+.sec.vis { opacity:1; transform:none; }
+
+.sec-hd {
+  display:flex; align-items:baseline; gap:16px;
+  margin-bottom:60px;
+}
+.sec-n {
+  font-size:8.5px; letter-spacing:3.5px; color:var(--c-ghost);
+  flex-shrink:0; font-weight:400;
+}
+.sec-t {
+  font-family:var(--f-display); font-weight:800;
+  font-size:clamp(26px,3vw,40px); letter-spacing:-1px;
+  text-transform:uppercase; color:var(--c-white);
+}
+.sec-ln {
+  flex:1; height:1px; background:var(--c-border);
+  align-self:center; margin-left:8px;
+}
+
+/* ─────────────────────────────────────────
+   ABOUT
+───────────────────────────────────────── */
+.about-grid {
+  display:grid; grid-template-columns:1.25fr .75fr; gap:80px; align-items:start;
+}
+
+.about-copy p {
+  font-size:12px; line-height:2.05; color:var(--c-sub); font-weight:300;
+  margin-bottom:20px;
+}
+.about-copy p:last-child { margin-bottom:0; }
+.about-copy strong { color:var(--c-white); font-weight:500; }
+
+/* info card */
+.icard {
+  background:var(--c-bg1); border:1px solid var(--c-border);
+  position:sticky; top:70px;
+}
+.icard-bar {
+  padding:11px 20px;
+  background:var(--c-bg2); border-bottom:1px solid var(--c-border);
+  display:flex; align-items:center; gap:7px;
+}
+.icd { width:8px; height:8px; border-radius:50%; }
+.icd.r{background:#3d1c1c;} .icd.y{background:#3d3120;} .icd.g{background:#1e3628;}
+.icard-title {
+  margin-left:auto; font-size:8px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--c-ghost);
+}
+.irow {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  padding:11px 20px; border-bottom:1px solid var(--c-border); gap:14px;
+}
+.irow:last-child { border-bottom:none; }
+.irow-k {
+  font-size:8px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--c-ghost); flex-shrink:0; padding-top:1px; line-height:1.6;
+}
+.irow-v { font-size:11px; color:var(--c-white); text-align:right; line-height:1.7; }
+.irow-v a {
+  color:var(--c-sub); text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:color .2s, border-color .2s;
+}
+.irow-v a:hover { color:var(--c-white); border-color:var(--c-mid); }
+.badge {
+  display:inline-block;
+  font-size:7.5px; letter-spacing:2px; text-transform:uppercase;
+  padding:3px 9px;
+  border:1px solid var(--c-green); color:var(--c-green2);
+  background:var(--c-greenhl);
+}
+
+/* ─────────────────────────────────────────
+   SKILLS
+───────────────────────────────────────── */
+.skills-wrap {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--c-border);
+  border:1px solid var(--c-border);
+}
+.sg {
+  background:var(--c-bg); padding:36px 32px;
+  position:relative; overflow:hidden;
+  transition:background .35s var(--ease);
+}
+.sg:hover { background:var(--c-bg1); }
+.sg::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .6s var(--ease);
+}
+.sg:hover::before { transform:scaleX(1); }
+.sg::after {
+  content:''; position:absolute;
+  bottom:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);
+}
+
+.sg-label {
+  font-size:7.5px; letter-spacing:3.5px; text-transform:uppercase;
+  color:var(--c-ghost); margin-bottom:28px;
+}
+.sg-label::before { content:'// '; }
+
+.sg-list { display:flex; flex-direction:column; gap:18px; }
+.sg-item {
+  display:flex; align-items:center; gap:12px;
+  font-size:12px; color:var(--c-white); font-weight:400;
+  transition:color .2s;
+}
+.sg:hover .sg-item { color:var(--c-white); }
+.sg-ico {
+  width:14px; height:14px; flex-shrink:0;
+  opacity:.4; transition:opacity .2s;
+}
+.sg:hover .sg-ico { opacity:.65; }
+
+/* ─────────────────────────────────────────
+   CONTACT
+───────────────────────────────────────── */
+.contact-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start;
+}
+
+.contact-intro {
+  font-size:12px; line-height:2.05; color:var(--c-sub);
+  font-weight:300; margin-bottom:34px;
+}
+
+.c-links { display:flex; flex-direction:column; gap:1px; background:var(--c-border); border:1px solid var(--c-border); }
+.c-link {
+  display:flex; align-items:center; gap:16px;
+  padding:15px 20px; background:var(--c-bg);
+  text-decoration:none; color:var(--c-white);
+  position:relative; overflow:hidden;
+  transition:background .25s var(--ease), padding-left .3s var(--ease);
+}
+.c-link::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0; width:1.5px;
+  background:var(--c-white);
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform .3s var(--ease);
+}
+.c-link:hover { background:var(--c-bg2); padding-left:28px; }
+.c-link:hover::before { transform:scaleY(1); }
+.c-glyph {
+  font-size:11px; font-family:var(--f-mono);
+  opacity:.22; flex-shrink:0; width:16px; text-align:center;
+}
+.c-plat { font-size:7.5px; letter-spacing:2.5px; text-transform:uppercase; color:var(--c-ghost); margin-bottom:3px; }
+.c-hand { font-size:11px; color:var(--c-white); letter-spacing:.3px; }
+
+/* form */
+.c-form { display:flex; flex-direction:column; gap:12px; }
+.cf-grp { display:flex; flex-direction:column; gap:5px; }
+.cf-lbl { font-size:7.5px; letter-spacing:3px; text-transform:uppercase; color:var(--c-ghost); }
+.cf-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.cf-in, .cf-ta {
+  background:var(--c-bg1);
+  border:none; border-bottom:1px solid var(--c-border2);
+  color:var(--c-white); font-family:var(--f-mono); font-size:11.5px;
+  padding:10px 12px; outline:none; border-radius:0; resize:none;
+  caret-color:var(--c-accent);
+  transition:border-color .25s, background .25s;
+}
+.cf-in::placeholder, .cf-ta::placeholder { color:var(--c-ghost); }
+.cf-in:focus, .cf-ta:focus {
+  border-color:var(--c-border3); background:var(--c-bg2);
+}
+.cf-ta { min-height:100px; }
+.cf-btn {
+  align-self:flex-start;
+  padding:11px 24px;
+  background:transparent; border:1px solid var(--c-border2);
+  color:var(--c-white); font-family:var(--f-mono);
+  font-size:9.5px; letter-spacing:2.5px; text-transform:uppercase;
+  cursor:none; position:relative; overflow:hidden;
+  transition:border-color .25s, color .25s;
+}
+.cf-btn::before {
+  content:''; position:absolute; inset:0;
+  background:var(--c-white);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .32s var(--ease); z-index:0;
+}
+.cf-btn:hover { color:var(--c-bg); border-color:var(--c-white); }
+.cf-btn:hover::before { transform:scaleX(1); }
+.cf-btn span { position:relative; z-index:1; }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+footer {
+  padding:38px 120px;
+  border-top:1px solid var(--c-border);
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:8.5px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--c-ghost); position:relative; z-index:1;
+}
+.footer-hexes { display:flex; align-items:center; gap:5px; }
+.fhx {
+  width:9px; height:9px;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  background:var(--c-ghost); opacity:.5;
+}
+.fhx:nth-child(2){opacity:.28;} .fhx:nth-child(3){opacity:.12;}
+
+/* ─────────────────────────────────────────
+   BACK TO TOP
+───────────────────────────────────────── */
+#btt {
+  position:fixed; bottom:28px; right:28px; z-index:300;
+  width:34px; height:34px;
+  border:1px solid var(--c-border2); background:rgba(4,5,6,.92);
+  backdrop-filter:blur(16px);
+  display:grid; place-items:center;
+  text-decoration:none; color:var(--c-mid);
+  cursor:none; opacity:0; pointer-events:none;
+  transition:opacity .3s, border-color .2s, color .2s;
+}
+#btt.on { opacity:1; pointer-events:all; }
+#btt:hover { border-color:var(--c-border3); color:var(--c-white); }
+</style>
+</head>
+<body>
+
+<!-- cursors -->
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+
+<!-- hex background -->
+<div id="hex-bg">
+  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="h1" x="0" y="0" width="76" height="88" patternUnits="userSpaceOnUse">
+        <polygon points="38,2 74,21 74,59 38,78 2,59 2,21"
+          fill="none" stroke="rgba(255,255,255,0.027)" stroke-width="1"/>
+      </pattern>
+      <pattern id="h2" x="38" y="44" width="76" height="88" patternUnits="userSpaceOnUse">
+        <polygon points="38,2 74,21 74,59 38,78 2,59 2,21"
+          fill="none" stroke="rgba(255,255,255,0.015)" stroke-width="1"/>
+      </pattern>
+      <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="transparent"/>
+        <stop offset="100%" stop-color="rgba(4,5,6,0.6)"/>
+      </radialGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#h1)"/>
+    <rect width="100%" height="100%" fill="url(#h2)"/>
+    <rect width="100%" height="100%" fill="url(#vignette)"/>
+  </svg>
+</div>
+
+<!-- ══════════════════════
+     NAV
+══════════════════════ -->
+<nav id="nav">
+  <a href="#hero" class="nav-id"><span class="dim">~/</span>abdulhaseeb</a>
+
+  <ul class="nav-center">
+    <li><a href="#about">about</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+
+  <div class="nav-signal">
+    <div class="signal-dot"></div>
+    <span>open to opportunities</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════
+     HERO
+══════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-left">
+
+    <div class="hero-prompt h-a1">
+      <span class="hp-host">root@archlinux</span>
+      <span class="hp-tilde">~</span>
+      <span class="hp-tilde">$</span>
+      <span class="hp-cmd">whoami</span>
+    </div>
+
+    <h1 class="hero-name h-a2">
+      <span>Abdul</span>
+      <span>Haseeb</span>
+    </h1>
+
+    <div class="hero-role h-a3">Cybersecurity Programmer</div>
+
+    <p class="hero-sub h-a4">// In Future &mdash; Systems / Defensive Programmer</p>
+
+    <div class="hero-typer h-a5">
+      <span class="typer-ps1">$</span>
+      <span id="tw"></span>
+    </div>
+
+    <div class="hero-stats h-a6">
+      <div class="hs">
+        <span class="hs-val">Pakistan</span>
+        <span class="hs-key">Location</span>
+      </div>
+      <div class="hs">
+        <span class="hs-val">Rust &middot; Python</span>
+        <span class="hs-key">Languages</span>
+      </div>
+      <div class="hs">
+        <span class="hs-val">Arch Linux</span>
+        <span class="hs-key">OS</span>
+      </div>
+      <div class="hs">
+        <span class="hs-val">Student</span>
+        <span class="hs-key">Status</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- decorative hex cluster -->
+  <div class="hero-right">
+    <svg viewBox="0 0 440 480" width="360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- outer rings -->
+      <polygon points="220,6 430,124 430,356 220,474 10,356 10,124"
+        stroke="rgba(255,255,255,0.04)" stroke-width="1" fill="rgba(255,255,255,0.006)"/>
+      <polygon points="220,28 408,136 408,344 220,452 32,344 32,136"
+        stroke="rgba(255,255,255,0.025)" stroke-width="1"/>
+      <polygon points="220,72 358,152 358,328 220,408 82,328 82,152"
+        stroke="rgba(255,255,255,0.05)" stroke-width="1" fill="rgba(255,255,255,0.01)"/>
+      <!-- mid ring -->
+      <polygon points="220,132 286,170 286,248 220,286 154,248 154,170"
+        stroke="rgba(255,255,255,0.09)" stroke-width="1" fill="rgba(255,255,255,0.025)"/>
+      <!-- inner -->
+      <polygon points="220,168 252,186 252,224 220,242 188,224 188,186"
+        stroke="rgba(255,255,255,0.12)" stroke-width="1" fill="rgba(255,255,255,0.04)"/>
+      <!-- spokes outer -->
+      <line x1="220" y1="6"   x2="220" y2="72"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <line x1="430" y1="124" x2="358" y2="152"  stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+      <line x1="430" y1="356" x2="358" y2="328"  stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+      <line x1="220" y1="474" x2="220" y2="408"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <line x1="10"  y1="356" x2="82"  y2="328"  stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+      <line x1="10"  y1="124" x2="82"  y2="152"  stroke="rgba(255,255,255,0.035)" stroke-width="1"/>
+      <!-- vertex micro-hexes -->
+      <polygon points="220,2 225,5 225,11 220,14 215,11 215,5"    fill="rgba(255,255,255,0.12)"/>
+      <polygon points="430,120 435,123 435,129 430,132 425,129 425,123" fill="rgba(255,255,255,0.08)"/>
+      <polygon points="430,352 435,355 435,361 430,364 425,361 425,355" fill="rgba(255,255,255,0.08)"/>
+      <polygon points="220,470 225,473 225,479 220,482 215,479 215,473" fill="rgba(255,255,255,0.12)"/>
+      <polygon points="10,120 15,123 15,129 10,132 5,129 5,123"    fill="rgba(255,255,255,0.08)"/>
+      <polygon points="10,352 15,355 15,361 10,364 5,361 5,355"    fill="rgba(255,255,255,0.08)"/>
+      <!-- center text -->
+      <text x="220" y="218" text-anchor="middle"
+        font-family="'Syne',sans-serif" font-weight="800" font-size="42"
+        letter-spacing="-2" fill="rgba(255,255,255,0.12)">AH</text>
+      <text x="220" y="237" text-anchor="middle"
+        font-family="monospace" font-size="7" letter-spacing="5"
+        fill="rgba(255,255,255,0.05)">CYBERSEC</text>
+      <!-- binary decorations -->
+      <text x="96"  y="214" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.04)">01001000</text>
+      <text x="252" y="214" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.04)">01000001</text>
+      <text x="164" y="230" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.03)">10110100</text>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     ABOUT
+══════════════════════ -->
+<section class="sec" id="about">
+  <div class="sec-hd">
+    <span class="sec-n">01</span>
+    <h2 class="sec-t">About</h2>
+    <div class="sec-ln"></div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-copy">
+      <p>
+        I am <strong>Abdul Haseeb</strong> &mdash; a cybersecurity programmer and student from <strong>Pakistan</strong>.
+        My focus is on understanding how systems break, and building them so they do not.
+      </p>
+      <p>
+        My toolkit is deliberately sharp: <strong>Rust</strong> for systems work where performance
+        and memory safety are non-negotiable, and <strong>Python</strong> for scripting, automation,
+        and security tooling. The best security engineers are programmers who think in attack surfaces.
+      </p>
+      <p>
+        I run <strong>Arch Linux</strong> with a fully customized <strong>Neovim</strong> environment.
+        Not an aesthetic choice &mdash; understanding your tools at the lowest level is how you catch
+        what others miss.
+      </p>
+      <p>
+        Currently studying and pushing toward a career in <strong>systems / defensive programming</strong>:
+        writing software that is correct, hardened, and built to withstand adversarial conditions.
+        No commercial projects yet. The foundations are being laid with intent.
+      </p>
+    </div>
+
+    <div class="icard">
+      <div class="icard-bar">
+        <div class="icd r"></div>
+        <div class="icd y"></div>
+        <div class="icd g"></div>
+        <span class="icard-title">system.info</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Status</span>
+        <span class="irow-v"><span class="badge">Student</span></span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Location</span>
+        <span class="irow-v">Pakistan</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Languages</span>
+        <span class="irow-v">Rust &middot; Python</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Focus</span>
+        <span class="irow-v">Systems / Defensive<br/>Programming</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">OS</span>
+        <span class="irow-v">Arch Linux</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Editor</span>
+        <span class="irow-v">Neovim</span>
+      </div>
+      <div class="irow">
+        <span class="irow-k">Email</span>
+        <span class="irow-v">
+          <a href="mailto:abdulhaseeb.ibn.tahir@gmail.com">
+            abdulhaseeb.ibn.tahir<br/>@gmail.com
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     SKILLS
+══════════════════════ -->
+<section class="sec" id="skills">
+  <div class="sec-hd">
+    <span class="sec-n">02</span>
+    <h2 class="sec-t">Skills &amp; Tools</h2>
+    <div class="sec-ln"></div>
+  </div>
+
+  <div class="skills-wrap">
+
+    <div class="sg">
+      <div class="sg-label">Languages</div>
+      <div class="sg-list">
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          Rust
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Python
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          Bash / Shell
+        </div>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-label">Security</div>
+      <div class="sg-list">
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Recon / OSINT
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Web Exploits
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          Cryptography
+        </div>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sg-label">Environment</div>
+      <div class="sg-list">
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+          Linux / Arch
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="4 7 4 4 20 4 20 7"/>
+            <line x1="9" y1="20" x2="15" y2="20"/>
+            <line x1="12" y1="4" x2="12" y2="20"/>
+          </svg>
+          Neovim
+        </div>
+        <div class="sg-item">
+          <svg class="sg-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="1.05" y1="12" x2="7" y2="12"/>
+            <line x1="17.01" y1="12" x2="22.96" y2="12"/>
+          </svg>
+          Git / CLI Tools
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════
+     CONTACT
+══════════════════════ -->
+<section class="sec" id="contact">
+  <div class="sec-hd">
+    <span class="sec-n">03</span>
+    <h2 class="sec-t">Contact</h2>
+    <div class="sec-ln"></div>
+  </div>
+
+  <div class="contact-grid">
+    <div>
+      <p class="contact-intro">
+        No commercial work yet &mdash; but always open for CTF collabs, security discussions,
+        code reviews, or talking shop about Rust, Linux, or infosec. If you are building
+        something interesting or want to connect, reach out.
+      </p>
+
+      <div class="c-links">
+        <a href="mailto:abdulhaseeb.ibn.tahir@gmail.com" class="c-link">
+          <span class="c-glyph">@</span>
+          <div>
+            <div class="c-plat">Email</div>
+            <div class="c-hand">abdulhaseeb.ibn.tahir@gmail.com</div>
+          </div>
+        </a>
+        <a href="https://github.com/abdulhaseeb-cyber" target="_blank" rel="noopener" class="c-link">
+          <span class="c-glyph">&lt;/&gt;</span>
+          <div>
+            <div class="c-plat">GitHub</div>
+            <div class="c-hand">abdulhaseeb-cyber</div>
+          </div>
+        </a>
+        <a href="https://gitlab.com/abdulhaseeb.cyber" target="_blank" rel="noopener" class="c-link">
+          <span class="c-glyph">&#9671;</span>
+          <div>
+            <div class="c-plat">GitLab</div>
+            <div class="c-hand">abdulhaseeb.cyber</div>
+          </div>
+        </a>
+        <a href="https://instagram.com/abdulhaseeb.cyber" target="_blank" rel="noopener" class="c-link">
+          <span class="c-glyph">&#9632;</span>
+          <div>
+            <div class="c-plat">Instagram</div>
+            <div class="c-hand">abdulhaseeb.cyber</div>
+          </div>
+        </a>
+        <a href="https://discord.com/users/1212460735217799210" target="_blank" rel="noopener" class="c-link">
+          <span class="c-glyph">#</span>
+          <div>
+            <div class="c-plat">Discord</div>
+            <div class="c-hand">abdulhaseeb.cyber</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="c-form">
+      <div class="cf-row">
+        <div class="cf-grp">
+          <label class="cf-lbl">Name</label>
+          <input class="cf-in" type="text" placeholder="Your name"/>
+        </div>
+        <div class="cf-grp">
+          <label class="cf-lbl">Email</label>
+          <input class="cf-in" type="email" placeholder="you@example.com"/>
+        </div>
+      </div>
+      <div class="cf-grp">
+        <label class="cf-lbl">Subject</label>
+        <input class="cf-in" type="text" placeholder="CTF collab, code review, question..."/>
+      </div>
+      <div class="cf-grp">
+        <label class="cf-lbl">Message</label>
+        <textarea class="cf-ta" placeholder="..."></textarea>
+      </div>
+      <button class="cf-btn"><span>send_message()</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════
+     FOOTER
+══════════════════════ -->
+<footer>
+  <span>&copy; 2026 Abdul Haseeb</span>
+  <div class="footer-hexes">
+    <div class="fhx"></div>
+    <div class="fhx"></div>
+    <div class="fhx"></div>
+  </div>
+  <span>Pakistan &middot; Arch Linux &middot; Rust &middot; Python</span>
+</footer>
+
+<!-- back to top -->
+<a href="#hero" id="btt">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</a>
+
+<script>
+/* ── CURSOR ── */
+const cDot  = document.getElementById('c-dot');
+const cRing = document.getElementById('c-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+(function loop() {
+  rx += (mx-rx) * .12;
+  ry += (my-ry) * .12;
+  cDot.style.cssText  = `left:${mx}px;top:${my}px`;
+  cRing.style.cssText = `left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(loop);
+})();
+
+/* ── TYPEWRITER ── */
+const lines = [
+  'python3 exploit.py --target 10.10.10.5',
+  'nmap -sS -A -T4 --script vuln 10.0.0.0/24',
+  'rustc --edition 2021 -O scanner.rs -o scanner',
+  'strace -f -e trace=network ./binary',
+  'nvim ~/.config/nvim/init.lua',
+  'objdump -d -M intel ./bin | grep -A 20 main',
+  'cat /proc/version && uname -r',
+  'gdb -q ./vulnerable && run $(python3 -c "print(\'A\'*80)")',
+];
+const tw = document.getElementById('tw');
+let li=0, ci=0, del=false;
+function tick() {
+  const s = lines[li];
+  tw.textContent = s.slice(0, ci);
+  if (!del) {
+    ci++;
+    if (ci > s.length) { del=true; setTimeout(tick,2100); return; }
+    setTimeout(tick, 42 + Math.random()*26);
+  } else {
+    ci--;
+    if (ci < 0) { ci=0; del=false; li=(li+1)%lines.length; setTimeout(tick,340); return; }
+    setTimeout(tick, 14);
+  }
+}
+setTimeout(tick, 1400);
+
+/* ── SCROLL REVEAL ── */
+new IntersectionObserver(
+  es => es.forEach(e => e.isIntersecting && e.target.classList.add('vis')),
+  { threshold:.06 }
+).observe ? (() => {
+  const io = new IntersectionObserver(
+    es => es.forEach(e => e.isIntersecting && e.target.classList.add('vis')),
+    { threshold:.06 }
+  );
+  document.querySelectorAll('.sec').forEach(s => io.observe(s));
+})() : document.querySelectorAll('.sec').forEach(s => s.classList.add('vis'));
+
+/* ── ACTIVE NAV ── */
+const navAs = [...document.querySelectorAll('.nav-center a')];
+const secEls = [...document.querySelectorAll('section[id]')];
+const navIO = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      navAs.forEach(a => a.classList.remove('on'));
+      const a = document.querySelector(`.nav-center a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('on');
+    }
+  });
+}, { threshold:.35 });
+secEls.forEach(s => navIO.observe(s));
+
+/* ── BACK TO TOP ── */
+const btt = document.getElementById('btt');
+window.addEventListener('scroll', () => btt.classList.toggle('on', scrollY > 380), {passive:true});
+</script>
+</body>
+</html>
